@@ -1,0 +1,13 @@
+#run with caddydev -after="log" -source="." cors -conf=test/Caddyfile
+# from caddy directory 
+
+http://localhost:9999 {
+	root ./test/target
+	cors /foo
+}
+
+#navigate browser to localhost:9998
+#sould see "Success! twice"
+http://localhost:9998 {
+	root ./test/origin
+}
