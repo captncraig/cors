@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/mholt/caddy/config/setup"
+	"github.com/mholt/caddy/caddy/setup"
 	"github.com/mholt/caddy/middleware"
 )
 
@@ -63,7 +63,7 @@ func parseRules(c *setup.Controller) ([]*corsRule, error) {
 				}
 				args := c.RemainingArgs()
 				for _, domain := range args {
-					rule.Conf.AllowedOrigins = append(rule.Conf.AllowedOrigins, strings.Split(domain, ",")...)
+					rule.Conf.AllowedOrigins = append(rule.Conf.AllowedOrigins, domain)
 				}
 				anyOrigins = true
 			case "methods":
@@ -72,36 +72,36 @@ func parseRules(c *setup.Controller) ([]*corsRule, error) {
 				} else {
 					rule.Conf.AllowedMethods = arg
 				}
-			case "allowCredentials":
-				if arg, err := singleArg(c, "allowCredentials"); err != nil {
+			case "allow_credentials":
+				if arg, err := singleArg(c, "allow_credentials"); err != nil {
 					return nil, err
 				} else {
 					var b bool
 					if arg == "true" {
 						b = true
 					} else if arg != "false" {
-						return nil, c.Errf("allowCredentials must be true or false.")
+						return nil, c.Errf("allow_credentials must be true or false.")
 					}
 					rule.Conf.AllowCredentials = &b
 				}
-			case "maxAge":
-				if arg, err := singleArg(c, "maxAge"); err != nil {
+			case "max_age":
+				if arg, err := singleArg(c, "max_age"); err != nil {
 					return nil, err
 				} else {
 					i, err := strconv.Atoi(arg)
 					if err != nil {
-						return nil, c.Err("maxAge must be valid int")
+						return nil, c.Err("max_age must be valid int")
 					}
 					rule.Conf.MaxAge = i
 				}
-			case "allowedHeaders":
-				if arg, err := singleArg(c, "allowedHeaders"); err != nil {
+			case "allowed_headers":
+				if arg, err := singleArg(c, "allowed_headers"); err != nil {
 					return nil, err
 				} else {
 					rule.Conf.AllowedHeaders = arg
 				}
-			case "exposedHeaders":
-				if arg, err := singleArg(c, "exposedHeaders"); err != nil {
+			case "exposed_headers":
+				if arg, err := singleArg(c, "exposed_headers"); err != nil {
 					return nil, err
 				} else {
 					rule.Conf.ExposedHeaders = arg

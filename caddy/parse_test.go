@@ -1,7 +1,7 @@
 package caddy
 
 import (
-	"github.com/mholt/caddy/config/setup"
+	"github.com/mholt/caddy/caddy/setup"
 	"reflect"
 	"testing"
 )
@@ -47,10 +47,10 @@ func TestFull(t *testing.T) {
 	conf := `cors {
   origin http://foo.com
   methods POST,PUT
-  allowCredentials true
-  maxAge 3600
-  allowedHeaders X-Foo,X-bar
-  exposedHeaders X-SECRET
+  allow_credentials true
+  max_age 3600
+  allowed_headers X-Foo,X-bar
+  exposed_headers X-SECRET
   origin http://bar.com
 }`
 	c := setup.NewTestController(conf)
