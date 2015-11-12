@@ -20,7 +20,7 @@ func TestParse_OneLines(t *testing.T) {
 		{"Single arg path", "cors /foo", 1, "/foo", []string{"*"}, false},
 		{"Additional arg domain", "cors /foo http://foo.com", 1, "/foo", []string{"http://foo.com"}, false},
 		{"Multiple domains", "cors /foo http://foo.com,http://bar.com", 1, "/foo", []string{"http://foo.com", "http://bar.com"}, false},
-		{"Extra args", "cors /foo http://foo.com http://bar.com", 0, "", nil, true},
+		{"Extra args", "cors /foo http://foo.com http://bar.com", 1, "/foo", []string{"http://foo.com", "http://bar.com"}, true},
 	}
 	for _, test := range testCases {
 		c := setup.NewTestController(test.text)
@@ -35,7 +35,7 @@ func TestParse_OneLines(t *testing.T) {
 			t.Fatalf("%s: Expected %d rules, but found %d.", test.desc, test.numRules, len(rules))
 		}
 		if rules[0].Path != test.path {
-			t.Fatalf("%s: Expected path of %s, but found %d.", test.desc, test.path, rules[0].Path)
+			t.Fatalf("%s: Expected path of %s, but found %s.", test.desc, test.path, rules[0].Path)
 		}
 		if !reflect.DeepEqual(rules[0].Conf.AllowedOrigins, test.allowedOrigins) {
 			t.Fatalf("%s: Allowed origins don't match. Expected: %v. Actual: %v.", test.desc, test.allowedOrigins, rules[0].Conf.AllowedOrigins)

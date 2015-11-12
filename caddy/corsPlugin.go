@@ -44,26 +44,25 @@ func parseRules(c *setup.Controller) ([]*corsRule, error) {
 		args := c.RemainingArgs()
 
 		anyOrigins := false
-		switch len(args) {
-		case 0:
-		case 2:
-			rule.Conf.AllowedOrigins = strings.Split(c.Val(), ",")
-			anyOrigins = true
-			fallthrough
-		case 1:
+		if len(args) > 0 {
 			rule.Path = args[0]
-		default:
-			return nil, c.Errf(`Too many arguments`, c.Val())
+		}
+		for i := 1; i < len(args); i++ {
+			if !anyOrigins {
+				rule.Conf.AllowedOrigins = nil
+			}
+			rule.Conf.AllowedOrigins = append(rule.Conf.AllowedOrigins, strings.Split(args[i], ",")...)
+			anyOrigins = true
 		}
 		for c.NextBlock() {
 			switch c.Val() {
 			case "origin":
 				if !anyOrigins {
-					rule.Conf.AllowedOrigins = []string{}
+					rule.Conf.AllowedOrigins = nil
 				}
 				args := c.RemainingArgs()
 				for _, domain := range args {
-					rule.Conf.AllowedOrigins = append(rule.Conf.AllowedOrigins, domain)
+					rule.Conf.AllowedOrigins = append(rule.Conf.AllowedOrigins, strings.Split(domain, ",")...)
 				}
 				anyOrigins = true
 			case "methods":
