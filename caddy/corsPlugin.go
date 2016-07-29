@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/mholt/caddy/caddy/setup"
-	"github.com/mholt/caddy/middleware"
+	"github.com/mholt/caddy"
+	"github.com/mholt/caddy/caddyhttp/httpserver"
 )
 
 type corsRule struct {
@@ -15,15 +15,23 @@ type corsRule struct {
 	Path string
 }
 
-func Setup(c *setup.Controller) (middleware.Middleware, error) {
+func init() {
+	caddy.RegisterPlugin("cors", caddy.Plugin{
+		ServerType: "http",
+		Action:     setup,
+	})
+}
+
+func setup(c *caddy.Controller) error {
 	rules, err := parseRules(c)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return func(next middleware.Handler) middleware.Handler {
-		return middleware.HandlerFunc(func(w http.ResponseWriter, r *http.Request) (int, error) {
+	siteConfig := httpserver.GetConfig(c.Key)
+	siteConfig.AddMiddleware(func(next httpserver.Handler) httpserver.Handler {
+		return httpserver.HandlerFunc(func(w http.ResponseWriter, r *http.Request) (int, error) {
 			for _, rule := range rules {
-				if middleware.Path(r.URL.Path).Matches(rule.Path) {
+				if httpserver.Path(r.URL.Path).Matches(rule.Path) {
 					rule.Conf.HandleRequest(w, r)
 					if cors.IsPreflight(r) {
 						return 200, nil
@@ -33,10 +41,11 @@ func Setup(c *setup.Controller) (middleware.Middleware, error) {
 			}
 			return next.ServeHTTP(w, r)
 		})
-	}, nil
+	})
+	return nil
 }
 
-func parseRules(c *setup.Controller) ([]*corsRule, error) {
+func parseRules(c *caddy.Controller) ([]*corsRule, error) {
 	rules := []*corsRule{}
 
 	for c.Next() {
@@ -114,7 +123,7 @@ func parseRules(c *setup.Controller) ([]*corsRule, error) {
 	return rules, nil
 }
 
-func singleArg(c *setup.Controller, desc string) (string, error) {
+func singleArg(c *caddy.Controller, desc string) (string, error) {
 	args := c.RemainingArgs()
 	if len(args) != 1 {
 		return "", c.Errf("%s expects exactly one argument", desc)
