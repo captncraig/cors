@@ -27,7 +27,7 @@ func setup(c *caddy.Controller) error {
 	if err != nil {
 		return err
 	}
-	siteConfig := httpserver.GetConfig(c.Key)
+	siteConfig := httpserver.GetConfig(c)
 	siteConfig.AddMiddleware(func(next httpserver.Handler) httpserver.Handler {
 		return httpserver.HandlerFunc(func(w http.ResponseWriter, r *http.Request) (int, error) {
 			for _, rule := range rules {

@@ -23,7 +23,7 @@ func TestParse_OneLines(t *testing.T) {
 		{"Extra args", "cors /foo http://foo.com http://bar.com", 1, "/foo", []string{"http://foo.com", "http://bar.com"}, true},
 	}
 	for _, test := range testCases {
-		c := caddy.NewTestController(test.text)
+		c := caddy.NewTestController("http", test.text)
 		rules, err := parseRules(c)
 		if err != nil {
 			if test.errors {
@@ -53,7 +53,7 @@ func TestFull(t *testing.T) {
   exposed_headers X-SECRET
   origin http://bar.com
 }`
-	c := caddy.NewTestController(conf)
+	c := caddy.NewTestController("http", conf)
 	rules, err := parseRules(c)
 	if err != nil {
 		t.Fatal(err)
