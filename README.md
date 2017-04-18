@@ -37,12 +37,14 @@ Protect specific paths only, and only allow a few domains:
 
 Full configuration:
 
-<code class="block"><span class="hl-directive">cors</span> <span class="hl-arg">/</span> {
-    <span class="hl-subdirective">origin</span>            http://allowedSite.com
-	<span class="hl-subdirective">origin</span>            http://anotherSite.org https://anotherSite.org
-    <span class="hl-subdirective">methods</span>           POST,PUT
-    <span class="hl-subdirective">allow_credentials</span> false
-	<span class="hl-subdirective">max_age</span>           3600
-	<span class="hl-subdirective">allowed_headers</span>   X-Custom-Header,X-Foobar
-	<span class="hl-subdirective">exposed_headers</span>   X-Something-Special,SomethingElse
-}</code>
+```
+cors / {
+  origin            http://allowedSite.com
+  origin            http://anotherSite.org https://anotherSite.org
+  methods           POST,PUT
+  allow_credentials false
+  max_age           3600
+  allowed_headers   X-Custom-Header,X-Foobar
+  exposed_headers   X-Something-Special,SomethingElse
+}
+```
