@@ -5,14 +5,16 @@ It allows you to whitelist particular domains per route, or to simply allow all 
 
 ### Syntax
 
-<code class="block"><span class="hl-directive">cors</span> <span class="hl-arg">[<i>path</i>] [<i>domains</i>]</span> {
-	<span class="hl-subdirective">origin</span>            <i>origin</i>
-	<span class="hl-subdirective">methods</span>           <i>methods</i>
-	<span class="hl-subdirective">allow_credentials</span> <i>allowCredentials</i>
-	<span class="hl-subdirective">max_age</span>           <i>maxAge</i>
-	<span class="hl-subdirective">allowed_headers</span>   <i>allowedHeaders</i>
-	<span class="hl-subdirective">exposed_headers</span>   <i>exposedHeaders</i>
-}</code>
+```
+cors [path] [domains...] {
+	origin            [origin]
+	methods           [methods]
+	allow_credentials [allowCredentials]
+	max_age           [maxAge]
+	allowed_headers   [allowedHeaders]
+	exposed_headers   [exposedHeaders]
+}
+```
 
 *   **path** is the file or directory this applies to (default is /).
 *   **domains** is a space-seperated list of domains to allow. If ommitted, all domains will be granted access.
