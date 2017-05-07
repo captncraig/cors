@@ -25,8 +25,8 @@ func TestDefault_Origin_Supplied(t *testing.T) {
 	w, r := getReq("OPTIONS")
 	r.Header.Set(originKey, "http://bar.com")
 	Default().HandleRequest(w, r)
-	if w.Header().Get(allowOriginKey) != "http://bar.com" {
-		t.Fatalf("Expect origin of \"http://bar.com\". Got \"%s\".", w.Header().Get(allowOriginKey))
+	if w.Header().Get(allowOriginKey) != "*" {
+		t.Fatalf("Expect origin of \"*\". Got \"%s\".", w.Header().Get(allowOriginKey))
 	}
 	if w.Header().Get(varyKey) != "Origin" {
 		t.Fatal("Must include Vary:Origin if allow origin header set to specific domain.")
