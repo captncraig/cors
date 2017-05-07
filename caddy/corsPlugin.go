@@ -34,9 +34,6 @@ func setup(c *caddy.Controller) error {
 			for _, rule := range rules {
 				if httpserver.Path(r.URL.Path).Matches(rule.Path) {
 					rule.Conf.HandleRequest(w, r)
-					if cors.IsPreflight(r) {
-						return 200, nil
-					}
 					break
 				}
 			}
