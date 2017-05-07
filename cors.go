@@ -50,7 +50,11 @@ func (c *Config) HandleRequest(w http.ResponseWriter, r *http.Request) {
 	//check origin against allowed origins
 	for _, ao := range c.AllowedOrigins {
 		if ao == "*" || ao == requestOrigin {
-			w.Header().Set(allowOriginKey, requestOrigin)
+			responseOrigin := "*"
+			if ao != "*" {
+				responseOrigin = requestOrigin
+			}
+			w.Header().Set(allowOriginKey, responseOrigin)
 			w.Header().Add(varyKey, originKey)
 			break
 		}

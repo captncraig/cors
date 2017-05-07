@@ -1,10 +1,11 @@
 package caddy
 
 import (
-	"github.com/captncraig/cors"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/captncraig/cors"
 
 	"github.com/mholt/caddy"
 	"github.com/mholt/caddy/caddyhttp/httpserver"
