@@ -53,3 +53,16 @@ func TestDefault_Methods(t *testing.T) {
 		t.Fatal("Allow methods should be set")
 	}
 }
+
+func TestDefault_AllowAllHeaders(t *testing.T) {
+	w, r := getReq("OPTIONS")
+	c := Default()
+	c.AllowedHeaders = "*"
+	reqHeaders := "Bar, Foo, X-Yz"
+	r.Header.Set(originKey, "http://bar.com")
+	r.Header.Set(requestHeadersKey, reqHeaders)
+	c.HandleRequest(w, r)
+	if w.Header().Get(allowHeadersKey) != reqHeaders {
+		t.Fatal("If AllowedHeaders is *, it should copy the value of requestHeadersKey to allowHeadersKey")
+	}
+}

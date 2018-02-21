@@ -67,7 +67,12 @@ func (c *Config) HandleRequest(w http.ResponseWriter, r *http.Request) {
 	if IsPreflight(r) {
 		w.Header().Set(allowMethodsKey, c.AllowedMethods)
 		if c.AllowedHeaders != "" {
-			w.Header().Set(allowHeadersKey, c.AllowedHeaders)
+			if c.AllowedHeaders != "*" {
+				w.Header().Set(allowHeadersKey, c.AllowedHeaders)
+			} else {
+				w.Header().Set(allowHeadersKey, r.Header.Get(requestHeadersKey))
+			}
+
 		}
 		if c.MaxAge > 0 {
 			w.Header().Set(maxAgeKey, fmt.Sprint(c.MaxAge))
