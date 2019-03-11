@@ -86,7 +86,7 @@ func parseRules(c *caddy.Controller) ([]*corsRule, error) {
 						return nil, c.Errf("could no compile regexp: %s", err)
 					}
 
-					rule.Conf.OriginRegexp = r
+					rule.Conf.OriginRegexps = append(rule.Conf.OriginRegexps, r)
 				}
 			case "methods":
 				if arg, err := singleArg(c, "methods"); err != nil {

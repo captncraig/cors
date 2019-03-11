@@ -46,15 +46,24 @@ func TestDefault_Dissallowed_Origin(t *testing.T) {
 }
 
 func TestDefault_Allowed_Origin_By_Regexp(t *testing.T) {
-	w, r := getReq("OPTIONS")
 	c := Default()
 	c.AllowedOrigins = []string{}
-	c.OriginRegexp = regexp.MustCompile("^http\\:\\/\\/(.*)\\.bar")
-	r.Header.Set(originKey, "http://foo.bar.com")
-	c.HandleRequest(w, r)
-	if w.Header().Get(allowOriginKey) != "http://foo.bar.com" {
-		t.Fatal("Should have origin header with the request origin when the regexp matches")
+	c.OriginRegexps = []*regexp.Regexp{
+		regexp.MustCompile(".+\\.example\\.com$"),
+		regexp.MustCompile("^http\\:\\/\\/(.+)\\.other\\.org$"),
 	}
+
+	allowedOrigins := []string{"http://foo.example.com", "http://bar.other.org"}
+
+	for _, origin := range allowedOrigins {
+		w, r := getReq("OPTIONS")
+		r.Header.Set(originKey, origin)
+		c.HandleRequest(w, r)
+		if w.Header().Get(allowOriginKey) != origin {
+			t.Fatal("Should have origin header with the request origin when the regexp matches")
+		}
+	}
+
 }
 
 func TestDefault_Methods(t *testing.T) {
