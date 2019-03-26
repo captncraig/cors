@@ -3,6 +3,7 @@ package cors
 import (
 	"fmt"
 	"net/http"
+	"regexp"
 )
 
 const (
@@ -22,6 +23,7 @@ const (
 
 type Config struct {
 	AllowedOrigins   []string
+	OriginRegexps    []*regexp.Regexp
 	AllowedMethods   string
 	AllowedHeaders   string
 	ExposedHeaders   string
@@ -32,6 +34,7 @@ type Config struct {
 func Default() *Config {
 	return &Config{
 		AllowedOrigins:   []string{"*"},
+		OriginRegexps:    []*regexp.Regexp{},
 		AllowedMethods:   "POST, GET, OPTIONS, PUT, DELETE",
 		AllowedHeaders:   "",
 		ExposedHeaders:   "",
@@ -47,6 +50,7 @@ func (c *Config) HandleRequest(w http.ResponseWriter, r *http.Request) {
 	if requestOrigin == "" {
 		return
 	}
+
 	//check origin against allowed origins
 	for _, ao := range c.AllowedOrigins {
 		if ao == "*" || ao == requestOrigin {
@@ -54,14 +58,17 @@ func (c *Config) HandleRequest(w http.ResponseWriter, r *http.Request) {
 			if ao != "*" {
 				responseOrigin = requestOrigin
 			}
-			w.Header().Set(allowOriginKey, responseOrigin)
-			w.Header().Add(varyKey, originKey)
+			addAllowOriginHeader(w, responseOrigin)
 			break
 		}
 	}
 
 	if w.Header().Get(allowOriginKey) == "" {
-		return //if we didn't set a valid allow-origin, none of the other headers matter
+		if c.anyOriginRegexpMatch(requestOrigin) {
+			addAllowOriginHeader(w, requestOrigin)
+		} else {
+			return //if we didn't set a valid allow-origin, none of the other headers matter
+		}
 	}
 
 	if IsPreflight(r) {
@@ -92,4 +99,19 @@ func (c *Config) HandleRequest(w http.ResponseWriter, r *http.Request) {
 
 func IsPreflight(r *http.Request) bool {
 	return r.Method == options && r.Header.Get(requestMethodKey) != ""
+}
+
+func addAllowOriginHeader(w http.ResponseWriter, allowedOrigin string) {
+	w.Header().Set(allowOriginKey, allowedOrigin)
+	w.Header().Add(varyKey, originKey)
+}
+
+func (c *Config) anyOriginRegexpMatch(origin string) bool {
+	for _, r := range c.OriginRegexps {
+		if r.MatchString(origin) {
+			return true
+		}
+	}
+
+	return false
 }

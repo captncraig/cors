@@ -3,6 +3,7 @@ package cors
 import (
 	"net/http"
 	"net/http/httptest"
+	"regexp"
 	"testing"
 )
 
@@ -42,6 +43,27 @@ func TestDefault_Dissallowed_Origin(t *testing.T) {
 	if w.Header().Get(allowOriginKey) != "" {
 		t.Fatal("Should not have origin header when no origin not explicitely allowed")
 	}
+}
+
+func TestDefault_Allowed_Origin_By_Regexp(t *testing.T) {
+	c := Default()
+	c.AllowedOrigins = []string{}
+	c.OriginRegexps = []*regexp.Regexp{
+		regexp.MustCompile(".+\\.example\\.com$"),
+		regexp.MustCompile("^http\\:\\/\\/(.+)\\.other\\.org$"),
+	}
+
+	allowedOrigins := []string{"http://foo.example.com", "http://bar.other.org"}
+
+	for _, origin := range allowedOrigins {
+		w, r := getReq("OPTIONS")
+		r.Header.Set(originKey, origin)
+		c.HandleRequest(w, r)
+		if w.Header().Get(allowOriginKey) != origin {
+			t.Fatal("Should have origin header with the request origin when the regexp matches")
+		}
+	}
+
 }
 
 func TestDefault_Methods(t *testing.T) {

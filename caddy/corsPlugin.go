@@ -2,6 +2,7 @@ package caddy
 
 import (
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -75,6 +76,23 @@ func parseRules(c *caddy.Controller) ([]*corsRule, error) {
 					rule.Conf.AllowedOrigins = append(rule.Conf.AllowedOrigins, strings.Split(domain, ",")...)
 				}
 				anyOrigins = true
+			case "origin_regexp":
+				if arg, err := singleArg(c, "origin_regexp"); err != nil {
+					return nil, err
+				} else {
+					r, err := regexp.Compile(arg)
+
+					if err != nil {
+						return nil, c.Errf("could no compile regexp: %s", err)
+					}
+
+					if !anyOrigins {
+						rule.Conf.AllowedOrigins = nil
+						anyOrigins = true
+					}
+
+					rule.Conf.OriginRegexps = append(rule.Conf.OriginRegexps, r)
+				}
 			case "methods":
 				if arg, err := singleArg(c, "methods"); err != nil {
 					return nil, err
