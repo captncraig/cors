@@ -1,7 +1,7 @@
 package caddy
 
 import (
-	"github.com/mholt/caddy"
+	"github.com/caddyserver/caddy"
 	"reflect"
 	"testing"
 )
